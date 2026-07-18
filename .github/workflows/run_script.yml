@@ -25,7 +25,7 @@ jobs:
         run: pip install requests beautifulsoup4
 
       - name: Ejecutar Extractor
-        run: python script.py
+        run: Fortino.py
 
       - name: Guardar cambios en GitHub
         run: |
