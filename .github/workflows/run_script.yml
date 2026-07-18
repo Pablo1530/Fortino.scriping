@@ -1,10 +1,9 @@
-name: Fortino
+name: Actualizar Tabla de Autos
 
 on:
   schedule:
-    # 15:00 UTC equivale a las 12:00 PM de Argentina (UTC-3)
     - cron: '0 15 * * *'
-  workflow_dispatch: # Esto te permite activar el script manualmente cuando quieras
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -28,8 +27,10 @@ jobs:
         run: python Fortino.py
 
       - name: Guardar cambios en GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'actions@github.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add index.html
           git diff-index --quiet HEAD || (git commit -m "Auto-actualización de stock" && git push)
