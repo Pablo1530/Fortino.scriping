@@ -1,0 +1,35 @@
+name: Fortino
+
+on:
+  schedule:
+    # 15:00 UTC equivale a las 12:00 PM de Argentina (UTC-3)
+    - cron: '0 15 * * *'
+  workflow_dispatch: # Esto te permite activar el script manualmente cuando quieras
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar librerías
+        run: pip install requests beautifulsoup4
+
+      - name: Ejecutar Extractor
+        run: python script.py
+
+      - name: Guardar cambios en GitHub
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add index.html
+          git diff-index --quiet HEAD || (git commit -m "Auto-actualización de stock" && git push)
