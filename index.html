@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buscador de Usados</title>
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; color: #333; background-color: #f9f9f9; }
+    h1 { color: #111; font-size: 24px; margin-bottom: 5px; }
+    .meta-info { color: #666; font-size: 13px; margin-bottom: 20px; }
+    .filter-panel { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+    .filter-group label { font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; }
+    .filter-group input, .filter-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    .table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    table { border-collapse: collapse; width: 100%; }
+    th { background: #0078d7; color: white; text-align: left; padding: 12px; font-size: 14px; }
+    td { border-bottom: 1px solid #eee; padding: 12px; font-size: 14px; }
+    tr:nth-child(even) { background: #fcfcfc; }
+    tr:hover { background: #f5f9ff; }
+    a { color: #0078d7; text-decoration: none; font-weight: bold; }
+    .no-results { display: none; padding: 20px; text-align: center; color: #888; font-style: italic; background: white; border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<h1>Stock de Usados</h1>
+<div class="meta-info">
+    Actualizado: <b>19/07/2026 16:02 ART</b> | Total: <b id="total-original">122</b> | Filtrados: <b id="total-filtrado">122</b>
+</div>
+
+<div class="filter-panel">
+    <div class="filter-group">
+        <label>Buscar</label>
+        <input type="text" id="searchBox" placeholder="Marca o modelo..." oninput="filtrarTabla()">
+    </div>
+    <div class="filter-group">
+        <label>Año Mín</label>
+        <input type="number" id="anioMin" placeholder="2015" oninput="filtrarTabla()">
+    </div>
+    <div class="filter-group">
+        <label>Km Máx</label>
+        <input type="number" id="kmMax" placeholder="100000" oninput="filtrarTabla()">
+    </div>
+    <div class="filter-group">
+        <label>Precio</label>
+        <select id="ordenPrecio" onchange="filtrarTabla()">
+            <option value="default">Por defecto</option>
+            <option value="asc">Menor precio</option>
+            <option value="desc">Mayor precio</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-container">
+    <table id="tablaAutos">
+        <thead>
+            <tr>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Año</th>
+                <th>Km</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpoTabla">
+
+        <tr class="auto-row" data-marca="BMW" data-modelo="X3 28 I XDRIVE" data-anio="2017" data-km="71000" data-precio="33900">
+            <td>BMW</td>
+            <td><a href="https://www.fortunatofortino.com/usado/bmw-x3-28-i-xdrive-2017-azul-71000km/" target="_blank">X3 28 I XDRIVE</a></td>
+            <td>2017</td>
+            <td>71000</td>
+            <td>$33,900</td>
+        </tr>
+        <tr class="auto-row" data-marca="CF" data-modelo="MOTO 700 MT" data-anio="2025" data-km="1000" data-precio="14385430">
+            <td>CF</td>
+            <td><a href="https://www.fortunatofortino.com/usado/cf-moto-700-mt-2026-a259xbu-negro-1000km/" target="_blank">MOTO 700 MT</a></td>
+            <td>2025</td>
+            <td>1000</td>
+            <td>$14,385,430</td>
+        </tr>
+        <tr class="auto-row" data-marca="CHERY" data-modelo="TIGGO 5 2.0 LUXURY CVT" data-anio="2018" data-km="55000" data-precio="18319000">
+            <td>CHERY</td>
+            <td><a href="https://www.fortunatofortino.com/usado/chery-tiggo-5-2-0-luxury-cvt-2018-azul-55000km/" target="_blank">TIGGO 5 2.0 LUXURY CVT</a></td>
+            <td>2018</td>
+            <td>55000</td>
+            <td>$18,319,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CHEVROLET" data-modelo="TRACKER 1.2T AT" data-anio="2023" data-km="80000" data-precio="26353000">
+            <td>CHEVROLET</td>
+            <td><a href="https://www.fortunatofortino.com/usado/chevrolet-spin-1-8-n-lt-m-t-2019-130000km/" target="_blank">TRACKER 1.2T AT</a></td>
+            <td>2023</td>
+            <td>80000</td>
+            <td>$26,353,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CHEVROLET" data-modelo="TRACKER 1.8 AWD LTZ AT" data-anio="2015" data-km="160000" data-precio="13090000">
+            <td>CHEVROLET</td>
+            <td><a href="https://www.fortunatofortino.com/usado/chevrolet-tracker-1-8-awd-ltz-at-2015-gris-160000km/" target="_blank">TRACKER 1.8 AWD LTZ AT</a></td>
+            <td>2015</td>
+            <td>160.000</td>
+            <td>$13,090,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CHEVROLET" data-modelo="TRACKER 1.8 LTZ PREMIER" data-anio="2019" data-km="86000" data-precio="20276000">
+            <td>CHEVROLET</td>
+            <td><a href="https://www.fortunatofortino.com/usado/chevrolet-tracker-1-8-ltz-premier-2019-gris-plata-86000km/" target="_blank">TRACKER 1.8 LTZ PREMIER</a></td>
+            <td>2019</td>
+            <td>86000</td>
+            <td>$20,276,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CHEVROLET" data-modelo="TRACKER AWD LTZ+" data-anio="2014" data-km="95000" data-precio="14155000">
+            <td>CHEVROLET</td>
+            <td><a href="https://www.fortunatofortino.com/usado/chevrolet-tracker-awd-ltz-2014-gris-plata-95000km/" target="_blank">TRACKER AWD LTZ+</a></td>
+            <td>2014</td>
+            <td>95000</td>
+            <td>$14,155,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CHRYSLER" data-modelo="JOURNEY SE 2.4" data-anio="2011" data-km="140000" data-precio="14442000">
+            <td>CHRYSLER</td>
+            <td><a href="https://www.fortunatofortino.com/usado/chrysler-journey-se-2-4-2011-gris-140000km/" target="_blank">JOURNEY SE 2.4</a></td>
+            <td>2011</td>
+            <td>140000</td>
+            <td>$14,442,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="BERLINGO FURGON 1.6 HDI" data-anio="2018" data-km="240000" data-precio="13590000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-berlingo-furgon-1-6-hdi-2018-blanca-240000km/" target="_blank">BERLINGO FURGON 1.6 HDI</a></td>
+            <td>2018</td>
+            <td>240000</td>
+            <td>$13,590,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 1.2 FEEL DESIGN" data-anio="2023" data-km="32000" data-precio="20500000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-1-2-feel-design-2023-gris-32000km/" target="_blank">C3 1.2 FEEL DESIGN</a></td>
+            <td>2023</td>
+            <td>32000</td>
+            <td>$20,500,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 1.2 FEEL PACK LOOK" data-anio="2023" data-km="30000" data-precio="22233000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-1-2-feel-pack-look-2023-blanco-30000km/" target="_blank">C3 1.2 FEEL PACK LOOK</a></td>
+            <td>2023</td>
+            <td>30000</td>
+            <td>$22,233,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 1.5 FEEL" data-anio="2017" data-km="98000" data-precio="11560000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-1-5-feel-2017-blanco-98000km/" target="_blank">C3 1.5 FEEL</a></td>
+            <td>2017</td>
+            <td>98000</td>
+            <td>$11,560,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 1.5 LIVE" data-anio="2017" data-km="125000" data-precio="13015000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-1-5-live-2017-rojo-rubi-125000km/" target="_blank">C3 1.5 LIVE</a></td>
+            <td>2017</td>
+            <td>125000</td>
+            <td>$13,015,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 1.5 LIVE" data-anio="2017" data-km="101000" data-precio="14611000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-1-5-live-2017-blanco-101000km/" target="_blank">C3 1.5 LIVE</a></td>
+            <td>2017</td>
+            <td>101000</td>
+            <td>$14,611,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2019" data-km="74000" data-precio="17392000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-2019-blanco-74000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2019</td>
+            <td>74000</td>
+            <td>$17,392,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2018" data-km="108000" data-precio="14915000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-2018-negro-108000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2018</td>
+            <td>108000</td>
+            <td>$14,915,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2016" data-km="186000" data-precio="13680000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroenc3-aircross-vti-115-feel-2016-rojo-83000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2016</td>
+            <td>186000</td>
+            <td>$13,680,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2018" data-km="75000" data-precio="14915000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-2018-rojo-rubi-75000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2018</td>
+            <td>75000</td>
+            <td>$14,915,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2017" data-km="80000" data-precio="14250000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-2017-blanco-80000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2017</td>
+            <td>80000</td>
+            <td>$14,250,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2018" data-km="75000" data-precio="14444000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-2018-blanco-75000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2018</td>
+            <td>75000</td>
+            <td>$14,444,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2020" data-km="130000" data-precio="15810000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-2020-rojo-130000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2020</td>
+            <td>130000</td>
+            <td>$15,810,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2017" data-km="186000" data-precio="12160000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-2017-blanco-186000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2017</td>
+            <td>186000</td>
+            <td>$12,160,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL" data-anio="2016" data-km="102000" data-precio="12410000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-2016-rojo-rubi-102000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL</a></td>
+            <td>2016</td>
+            <td>102000</td>
+            <td>$12,410,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 FEEL AT C/GNC" data-anio="2020" data-km="84000" data-precio="18216000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-feel-at-c-gnc-2020-rojo-84000km/" target="_blank">C3 AIRCROSS VTI 115 FEEL AT C/GNC</a></td>
+            <td>2020</td>
+            <td>84000</td>
+            <td>$18,216,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 AIRCROSS VTI 115 SHINE" data-anio="2016" data-km="147000" data-precio="12080000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-aircross-vti-115-shine-2016-147000km/" target="_blank">C3 AIRCROSS VTI 115 SHINE</a></td>
+            <td>2016</td>
+            <td>147000</td>
+            <td>$12,080,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI 115 LIVE" data-anio="2018" data-km="53000" data-precio="14820000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-115-live-2018-gris-grafito-53000km/" target="_blank">C3 VTI 115 LIVE</a></td>
+            <td>2018</td>
+            <td>53000</td>
+            <td>$14,820,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI EXCLUSIVE" data-anio="2013" data-km="142000" data-precio="9990000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-exclusive-2013-negro-142-000km/" target="_blank">C3 VTI EXCLUSIVE</a></td>
+            <td>2013</td>
+            <td>142000</td>
+            <td>$9,990,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI FEEL" data-anio="2020" data-km="72000" data-precio="16532000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-feel-2020-blanco-72000km/" target="_blank">C3 VTI FEEL</a></td>
+            <td>2020</td>
+            <td>72000</td>
+            <td>$16,532,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI FEEL" data-anio="2017" data-km="133000" data-precio="12960000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-feel-2017-blanco-133000km/" target="_blank">C3 VTI FEEL</a></td>
+            <td>2017</td>
+            <td>133000</td>
+            <td>$12,960,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI FEEL" data-anio="2016" data-km="172000" data-precio="11200000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-feel-2016negro-172000km/" target="_blank">C3 VTI FEEL</a></td>
+            <td>2016</td>
+            <td>172000</td>
+            <td>$11,200,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI FEEL" data-anio="2017" data-km="104000" data-precio="12410000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-feel-2017-104000km/" target="_blank">C3 VTI FEEL</a></td>
+            <td>2017</td>
+            <td>104000</td>
+            <td>$12,410,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI LIVE" data-anio="2018" data-km="69000" data-precio="14900000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-live-2018-gris-69000km/" target="_blank">C3 VTI LIVE</a></td>
+            <td>2018</td>
+            <td>69000</td>
+            <td>$14,900,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI LIVE" data-anio="2020" data-km="80000" data-precio="16980000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-live-2020-gris-grafito-80000km/" target="_blank">C3 VTI LIVE</a></td>
+            <td>2020</td>
+            <td>80000</td>
+            <td>$16,980,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI LIVE" data-anio="2016" data-km="102000" data-precio="12160000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroenc3-1-5-live-2016-rojo-rubi-102000km/" target="_blank">C3 VTI LIVE</a></td>
+            <td>2016</td>
+            <td>102000</td>
+            <td>$12,160,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI LIVE" data-anio="2016" data-km="140000" data-precio="12445000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-1-5-live-2016-blanco-140000km/" target="_blank">C3 VTI LIVE</a></td>
+            <td>2016</td>
+            <td>140000</td>
+            <td>$12,445,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI LIVE" data-anio="2018" data-km="100000" data-precio="13965000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-live-2018-gris-grafito-100000km/" target="_blank">C3 VTI LIVE</a></td>
+            <td>2018</td>
+            <td>100000</td>
+            <td>$13,965,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C3 VTI ORIGINS" data-anio="2020" data-km="100000" data-precio="17392000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c3-vti-origins-2020-blanco-100000km/" target="_blank">C3 VTI ORIGINS</a></td>
+            <td>2020</td>
+            <td>100000</td>
+            <td>$17,392,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 CACTUS 1.2 PURETECH RIP CURL AT" data-anio="2018" data-km="112000" data-precio="16498000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-cactus-1-2-puretech-rip-curl-at2018-gris-112000km/" target="_blank">C4 CACTUS 1.2 PURETECH RIP CURL AT</a></td>
+            <td>2018</td>
+            <td>112000</td>
+            <td>$16,498,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 CACTUS VTI FEEL" data-anio="2018" data-km="102000" data-precio="18113000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-cactus-vti-feel-pack-2018-gris-aluminio-102000km/" target="_blank">C4 CACTUS VTI FEEL</a></td>
+            <td>2018</td>
+            <td>102000</td>
+            <td>$18,113,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 CACTUS VTI FEEL" data-anio="2023" data-km="62000" data-precio="25323000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-cactus-vti-feel-2023-gris-grafito-62000km/" target="_blank">C4 CACTUS VTI FEEL</a></td>
+            <td>2023</td>
+            <td>62000</td>
+            <td>$25,323,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 CACTUS VTI FEEL" data-anio="2022" data-km="31000" data-precio="22644999">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-cactus-vti-feel-2022-gris-31000km/" target="_blank">C4 CACTUS VTI FEEL</a></td>
+            <td>2022</td>
+            <td>31000</td>
+            <td>$22,644,999</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 CACTUS VTI FEEL" data-anio="2020" data-km="90000" data-precio="19555000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-cactus-vti-feel-2020-gris-aluminio-90000km/" target="_blank">C4 CACTUS VTI FEEL</a></td>
+            <td>2020</td>
+            <td>90000</td>
+            <td>$19,555,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 CACTUS VTI FEEL" data-anio="2022" data-km="97000" data-precio="19044000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-cactus-vti-feel-2022-negro-97000km/" target="_blank">C4 CACTUS VTI FEEL</a></td>
+            <td>2022</td>
+            <td>97000</td>
+            <td>$19,044,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 CACTUS VTI FEEL PACK PLUS AT" data-anio="2022" data-km="85000" data-precio="19995000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-cactus-vti-feel-pack-plus-at-2022-negro-85000km/" target="_blank">C4 CACTUS VTI FEEL PACK PLUS AT</a></td>
+            <td>2022</td>
+            <td>85000</td>
+            <td>$19,995,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 LOUNGE 1.6 THP S EDITION" data-anio="2016" data-km="115000" data-precio="13600000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-lounge-1-6-thp-s-edition-2016-115000km/" target="_blank">C4 LOUNGE 1.6 THP S EDITION</a></td>
+            <td>2016</td>
+            <td>115000</td>
+            <td>$13,600,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 LOUNGE 2.0 LIVE" data-anio="2016" data-km="124000" data-precio="13395000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-lounge-2-0-live-2016-blanco-124000km/" target="_blank">C4 LOUNGE 2.0 LIVE</a></td>
+            <td>2016</td>
+            <td>124000</td>
+            <td>$13,395,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 LOUNGE 2.0 TENDANCE PACK C/GNC" data-anio="2015" data-km="156000" data-precio="11528000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-lounge-2-0-tendance-pack-c-gnc-2015-blanco-156000km/" target="_blank">C4 LOUNGE 2.0 TENDANCE PACK C/GNC</a></td>
+            <td>2015</td>
+            <td>156000</td>
+            <td>$11,528,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 LOUNGE THP 165 AT6 SHINE AM19" data-anio="2019" data-km="29000" data-precio="18731000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-lounge-thp-165-at6-shine-am19-2019-rojo-salta-29000km/" target="_blank">C4 LOUNGE THP 165 AT6 SHINE AM19</a></td>
+            <td>2019</td>
+            <td>29000</td>
+            <td>$18,731,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="C4 LOUNGE THP SHINE" data-anio="2018" data-km="77000" data-precio="16435000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-c4-lounge-thp-shine-2018-gris-77000km/" target="_blank">C4 LOUNGE THP SHINE</a></td>
+            <td>2018</td>
+            <td>77000</td>
+            <td>$16,435,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="CITROEN" data-modelo="JUMPER L3H2 2.2 CHASIS" data-anio="2018" data-km="270000" data-precio="26945000">
+            <td>CITROEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/citroen-jumper-l3h2-2-2-chasis-2018-blanca-270000km/" target="_blank">JUMPER L3H2 2.2 CHASIS</a></td>
+            <td>2018</td>
+            <td>270000</td>
+            <td>$26,945,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FIAT" data-modelo="LINEA 1.8 HLX" data-anio="2012" data-km="190000" data-precio="9540000">
+            <td>FIAT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/fiat-linea-1-8-hlx-2012-gris-oscuro-190000km/" target="_blank">LINEA 1.8 HLX</a></td>
+            <td>2012</td>
+            <td>190000</td>
+            <td>$9,540,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FIAT" data-modelo="PALIO 1.4 ATTRACTIVE" data-anio="2016" data-km="75000" data-precio="15177500">
+            <td>FIAT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/fiat-palio-1-4-attractive-2016-gris-plata-75000km/" target="_blank">PALIO 1.4 ATTRACTIVE</a></td>
+            <td>2016</td>
+            <td>75000</td>
+            <td>$15,177,500</td>
+        </tr>
+        <tr class="auto-row" data-marca="FIAT" data-modelo="TORO VOLCANO 2.0 16V 4X4" data-anio="2017" data-km="240000" data-precio="18445000">
+            <td>FIAT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/fiat-toro-volcano-2-0-16v-4x42017-bordo-240000km/" target="_blank">TORO VOLCANO 2.0 16V 4X4</a></td>
+            <td>2017</td>
+            <td>240000</td>
+            <td>$18,445,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="ECOSPORT 1.5 SE" data-anio="2018" data-km="55000" data-precio="17860000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ecosport-1-5-se-2018-negra-55000km/" target="_blank">ECOSPORT 1.5 SE</a></td>
+            <td>2018</td>
+            <td>55000</td>
+            <td>$17,860,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="ECOSPORT 1.5 TDCI SE" data-anio="2019" data-km="96000" data-precio="17765000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ecosport-1-5-tdci-se-2019-gris-96000km/" target="_blank">ECOSPORT 1.5 TDCI SE</a></td>
+            <td>2019</td>
+            <td>96000</td>
+            <td>$17,765,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="ECOSPORT 2.0 SE" data-anio="2015" data-km="49000" data-precio="15252000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ecosport-2-0-se-2015-bordo-49000km/" target="_blank">ECOSPORT 2.0 SE</a></td>
+            <td>2015</td>
+            <td>49000</td>
+            <td>$15,252,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="ECOSPORT 2.0 TITANIUM" data-anio="2014" data-km="146000" data-precio="14220000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ecosport-2-0-titanium-2014-gris-146000km/" target="_blank">ECOSPORT 2.0 TITANIUM</a></td>
+            <td>2014</td>
+            <td>146000</td>
+            <td>$14,220,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="ECOSPORT 2.0 TITANIUM AT" data-anio="2019" data-km="62000" data-precio="22135000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ecosport-2-0-titanium-at-2019-blanco-62000km/" target="_blank">ECOSPORT 2.0 TITANIUM AT</a></td>
+            <td>2019</td>
+            <td>62000</td>
+            <td>$22,135,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="ECOSPORT FREESTYLE 1.5 MT" data-anio="2019" data-km="52000" data-precio="21409000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ecosport-freestyle-1-5-mt-2019-blanco-52000km/" target="_blank">ECOSPORT FREESTYLE 1.5 MT</a></td>
+            <td>2019</td>
+            <td>52000</td>
+            <td>$21,409,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="ECOSPORT FREESTYLE 2.0 MT N 4WD" data-anio="2014" data-km="91000" data-precio="14365000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ecosport-freestyle-2-0-mt-n-4wd-2014-perla-ocre-91000km/" target="_blank">ECOSPORT FREESTYLE 2.0 MT N 4WD</a></td>
+            <td>2014</td>
+            <td>91000</td>
+            <td>$14,365,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="ECOSPORT SE 1.5 TDCI MT" data-anio="2014" data-km="100000" data-precio="11520000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ecosport-se-1-5-tdci-mt-2014-100000km/" target="_blank">ECOSPORT SE 1.5 TDCI MT</a></td>
+            <td>2014</td>
+            <td>100000</td>
+            <td>$11,520,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="FIESTA KD 1 6 S" data-anio="2017" data-km="120000" data-precio="14896000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-fiesta-kd-1-6-s-2017-blanco-120000km/" target="_blank">FIESTA KD 1 6 S</a></td>
+            <td>2017</td>
+            <td>120000</td>
+            <td>$14,896,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="FIESTA KD 1.6 S" data-anio="2017" data-km="163000" data-precio="13024000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-fiesta-kd-1-6-s-2017-gris-plata-163000km/" target="_blank">FIESTA KD 1.6 S</a></td>
+            <td>2017</td>
+            <td>163000</td>
+            <td>$13,024,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="FIESTA KD 1.6 SE" data-anio="2018" data-km="101000" data-precio="16036000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-fiesta-kd-1-6-se-2018-blanco-101000km/" target="_blank">FIESTA KD 1.6 SE</a></td>
+            <td>2018</td>
+            <td>101000</td>
+            <td>$16,036,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="FIESTA KD 1.6 TITANIUM 5PTS" data-anio="2017" data-km="120000" data-precio="15368000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-fiesta-kd-1-6-titanium-5pts-2017-gris-plata-120000km/" target="_blank">FIESTA KD 1.6 TITANIUM 5PTS</a></td>
+            <td>2017</td>
+            <td>120000</td>
+            <td>$15,368,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="FOCUS 1.6 5PTS S" data-anio="2014" data-km="152000" data-precio="12304000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-focus-1-6-5pts-s-2014-gris-152000km/" target="_blank">FOCUS 1.6 5PTS S</a></td>
+            <td>2014</td>
+            <td>152000</td>
+            <td>$12,304,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="FOCUS 1.6 5PTS S" data-anio="2014" data-km="133000" data-precio="13073000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-focus-1-6-5pts-s-2014-blanco-133000km/" target="_blank">FOCUS 1.6 5PTS S</a></td>
+            <td>2014</td>
+            <td>133000</td>
+            <td>$13,073,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="FOCUS 1.6 N M/T S" data-anio="2017" data-km="138909" data-precio="16452000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-focus-1-6-n-m-t-s-2017-bordo-138909km/" target="_blank">FOCUS 1.6 N M/T S</a></td>
+            <td>2017</td>
+            <td>138909</td>
+            <td>$16,452,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="FOCUS 4 PTS S 1.6" data-anio="2018" data-km="99000" data-precio="17651000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-focus-4-pts-s-1-6-2018-azul-99000km/" target="_blank">FOCUS 4 PTS S 1.6</a></td>
+            <td>2018</td>
+            <td>99000</td>
+            <td>$17,651,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="KA 1.5 S" data-anio="2019" data-km="65000" data-precio="15960000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ka-1-5-s-2019-rojo-65000km/" target="_blank">KA 1.5 S</a></td>
+            <td>2019</td>
+            <td>65000</td>
+            <td>$15,960,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="KA 1.5 S" data-anio="2020" data-km="83000" data-precio="16910000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ka-1-5-s-2020-rojo-83000km/" target="_blank">KA 1.5 S</a></td>
+            <td>2020</td>
+            <td>83000</td>
+            <td>$16,910,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="KA 1.5 S" data-anio="2017" data-km="184000" data-precio="12053000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ka-1-5-s-2017-bordo-184000km/" target="_blank">KA 1.5 S</a></td>
+            <td>2017</td>
+            <td>184000</td>
+            <td>$12,053,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="KA 1.5 SE" data-anio="2019" data-km="134000" data-precio="15300000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-ka-1-5-se-2019-rojo-134000km/" target="_blank">KA 1.5 SE</a></td>
+            <td>2019</td>
+            <td>134000</td>
+            <td>$15,300,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="FORD" data-modelo="KUGA 2.0 4X2 SEL ECOBOOST AT" data-anio="2017" data-km="98000" data-precio="21600000">
+            <td>FORD</td>
+            <td><a href="https://www.fortunatofortino.com/usado/ford-kuga-2-0-4x2-sel-ecoboost-at-2017-bordo-98000km/" target="_blank">KUGA 2.0 4X2 SEL ECOBOOST AT</a></td>
+            <td>2017</td>
+            <td>98000</td>
+            <td>$21,600,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="GILERA" data-modelo="AC4 250" data-anio="2022" data-km="4000" data-precio="3571050">
+            <td>GILERA</td>
+            <td><a href="https://www.fortunatofortino.com/usado/gilera-ac4-250-2022-bordo-4000km/" target="_blank">AC4 250</a></td>
+            <td>2022</td>
+            <td>4000</td>
+            <td>$3,571,050</td>
+        </tr>
+        <tr class="auto-row" data-marca="HERO" data-modelo="HUNK 190R" data-anio="2023" data-km="18000" data-precio="3383900">
+            <td>HERO</td>
+            <td><a href="https://www.fortunatofortino.com/usado/hero-hunk-190r-2023-negro-18000km/" target="_blank">HUNK 190R</a></td>
+            <td>2023</td>
+            <td>18000</td>
+            <td>$3,383,900</td>
+        </tr>
+        <tr class="auto-row" data-marca="JEEP" data-modelo="COMPASS LONGITUDE 1.3T AT6 4X2" data-anio="2024" data-km="27500" data-precio="40000000">
+            <td>JEEP</td>
+            <td><a href="https://www.fortunatofortino.com/usado/jeep-compass-longitude-1-3t-at6-4x2-2024-gris-27500km/" target="_blank">COMPASS LONGITUDE 1.3T AT6 4X2</a></td>
+            <td>2024</td>
+            <td>27500</td>
+            <td>$40,000,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="JEEP" data-modelo="COMPASS LONGITUDE 2.4 AT9" data-anio="2018" data-km="79000" data-precio="29546000">
+            <td>JEEP</td>
+            <td><a href="https://www.fortunatofortino.com/usado/jeep-compass-longitude-2-4-at9-2018-gris-79000km/" target="_blank">COMPASS LONGITUDE 2.4 AT9</a></td>
+            <td>2018</td>
+            <td>79000</td>
+            <td>$29,546,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="JEEP" data-modelo="RENEGADE SPORT" data-anio="2018" data-km="120000" data-precio="19475000">
+            <td>JEEP</td>
+            <td><a href="https://www.fortunatofortino.com/usado/jeep-renegade-sport-2018-bordo-120000km/" target="_blank">RENEGADE SPORT</a></td>
+            <td>2018</td>
+            <td>120000</td>
+            <td>$19,475,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="KAIYI" data-modelo="X3" data-anio="2025" data-km="0" data-precio="33100000">
+            <td>KAIYI</td>
+            <td><a href="https://www.fortunatofortino.com/usado/kaiyi-x3-2025-0km/" target="_blank">X3</a></td>
+            <td>2025</td>
+            <td>0</td>
+            <td>$33,100,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="KIA" data-modelo="SPORTAGE EX 2.0 AT 4X4 CRDI GT-LINE" data-anio="2018" data-km="140000" data-precio="32300000">
+            <td>KIA</td>
+            <td><a href="https://www.fortunatofortino.com/usado/kia-sportage-ex-2-0-at-4x4-crdi-gt-line2018-gris-140000km/" target="_blank">SPORTAGE EX 2.0 AT 4X4 CRDI GT-LINE</a></td>
+            <td>2018</td>
+            <td>140000</td>
+            <td>$32,300,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="LANCHA" data-modelo="CANESTRARI MONZA" data-anio="2010" data-km="0" data-precio="5580000">
+            <td>LANCHA</td>
+            <td><a href="https://www.fortunatofortino.com/usado/lancha-canestrari-monza-motor-mariner-110/" target="_blank">CANESTRARI MONZA</a></td>
+            <td>2010</td>
+            <td></td>
+            <td>$5,580,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="LIFAN" data-modelo="KPV150" data-anio="2025" data-km="3000" data-precio="3752500">
+            <td>LIFAN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/lifan-kpv150-2025-blanco-3000km/" target="_blank">KPV150</a></td>
+            <td>2025</td>
+            <td>3000</td>
+            <td>$3,752,500</td>
+        </tr>
+        <tr class="auto-row" data-marca="MOTOMEL" data-modelo="SKUA 125 X-TREME" data-anio="2019" data-km="2700" data-precio="1810700">
+            <td>MOTOMEL</td>
+            <td><a href="https://www.fortunatofortino.com/usado/motomel-skua-125-x-treme-2019-rojo-2700/" target="_blank">SKUA 125 X-TREME</a></td>
+            <td>2019</td>
+            <td>2700</td>
+            <td>$1,810,700</td>
+        </tr>
+        <tr class="auto-row" data-marca="NISSAN" data-modelo="KICKS ADVANCE CVT" data-anio="2018" data-km="90000" data-precio="24602000">
+            <td>NISSAN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/nissan-kicks-advance-cvt-2018-naranja-90000km/" target="_blank">KICKS ADVANCE CVT</a></td>
+            <td>2018</td>
+            <td>90000</td>
+            <td>$24,602,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="NISSAN" data-modelo="KICKS ADVANCE CVT" data-anio="2018" data-km="81000" data-precio="24602000">
+            <td>NISSAN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/nissan-kicks-advance-cvt-2018-blanco-81000km/" target="_blank">KICKS ADVANCE CVT</a></td>
+            <td>2018</td>
+            <td>81000</td>
+            <td>$24,602,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="NISSAN" data-modelo="NOTE EXCLUSIVE CVT PURE DRIVE" data-anio="2017" data-km="90000" data-precio="15597500">
+            <td>NISSAN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/nissan-note-exclusive-cvt-pure-drive2017-blanco-90000km/" target="_blank">NOTE EXCLUSIVE CVT PURE DRIVE</a></td>
+            <td>2017</td>
+            <td>90000</td>
+            <td>$15,597,500</td>
+        </tr>
+        <tr class="auto-row" data-marca="NISSAN" data-modelo="NOTE SENSE PURE DRIVE" data-anio="2018" data-km="74000" data-precio="17600000">
+            <td>NISSAN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/nissan-note-sense-pure-drive-2018-bordo-74000km/" target="_blank">NOTE SENSE PURE DRIVE</a></td>
+            <td>2018</td>
+            <td>74000</td>
+            <td>$17,600,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="NISSAN" data-modelo="NOTE SENSE PURE DRIVE" data-anio="2016" data-km="82000" data-precio="14772500">
+            <td>NISSAN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/nissan-note-sense-pure-drive-2016-gris-plata-82000km/" target="_blank">NOTE SENSE PURE DRIVE</a></td>
+            <td>2016</td>
+            <td>82000</td>
+            <td>$14,772,500</td>
+        </tr>
+        <tr class="auto-row" data-marca="NISSAN" data-modelo="NOTE SENSE PURE DRIVE" data-anio="2017" data-km="101000" data-precio="18422000">
+            <td>NISSAN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/nissan-note-sense-pure-drive-2017-rojo-101000km/" target="_blank">NOTE SENSE PURE DRIVE</a></td>
+            <td>2017</td>
+            <td>101000</td>
+            <td>$18,422,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="2008 THP SPORT" data-anio="2020" data-km="160000" data-precio="15760000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-2008-thp-sport-2020-blanco-160000km/" target="_blank">2008 THP SPORT</a></td>
+            <td>2020</td>
+            <td>160000</td>
+            <td>$15,760,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="2008 VTI ACTIVE" data-anio="2019" data-km="47000" data-precio="17289000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-2008-vti-active-2019-blanco-47000km/" target="_blank">2008 VTI ACTIVE</a></td>
+            <td>2019</td>
+            <td>47000</td>
+            <td>$17,289,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="2008 VTI ALLURE" data-anio="2017" data-km="104000" data-precio="13410000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-2008-vti-allure-2017-blanco-nacarado-104000km/" target="_blank">2008 VTI ALLURE</a></td>
+            <td>2017</td>
+            <td>104000</td>
+            <td>$13,410,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="2008 VTI FELINE" data-anio="2018" data-km="95000" data-precio="17598000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-2008-vti-feline-2018-negra-95000-km/" target="_blank">2008 VTI FELINE</a></td>
+            <td>2018</td>
+            <td>95000</td>
+            <td>$17,598,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="2008 VTI FELINE" data-anio="2019" data-km="82000" data-precio="18066000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-2008-vti-feline-2019-blanco-82000km/" target="_blank">2008 VTI FELINE</a></td>
+            <td>2019</td>
+            <td>82000</td>
+            <td>$18,066,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="207 COMPACT XT SEDAN" data-anio="2010" data-km="92000" data-precio="9512500">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-207-compact-xt-sedan-2010-gris-oscuro-92000km/" target="_blank">207 COMPACT XT SEDAN</a></td>
+            <td>2010</td>
+            <td>92000</td>
+            <td>$9,512,500</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="208 ALLURE NAV 1.5" data-anio="2017" data-km="157000" data-precio="11136000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-208-allure-nav-1-5-2017-negro-157000km/" target="_blank">208 ALLURE NAV 1.5</a></td>
+            <td>2017</td>
+            <td>157000</td>
+            <td>$11,136,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="208 FELINE 1.6" data-anio="2014" data-km="160000" data-precio="11440000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-208-feline-1-6-2014-blanco-160000km/" target="_blank">208 FELINE 1.6</a></td>
+            <td>2014</td>
+            <td>160000</td>
+            <td>$11,440,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="408 2.0 ALLURE NAV" data-anio="2014" data-km="136000" data-precio="9920000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-408-2-0-allure-nav-2014-136000km/" target="_blank">408 2.0 ALLURE NAV</a></td>
+            <td>2014</td>
+            <td>136000</td>
+            <td>$9,920,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="408 ALLURE PLUS THP" data-anio="2016" data-km="134000" data-precio="13632500">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-408-allure-plus-thp-2016-gris-134000km/" target="_blank">408 ALLURE PLUS THP</a></td>
+            <td>2016</td>
+            <td>134000</td>
+            <td>$13,632,500</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="EXPERT 1.6 HDI CONFORT" data-anio="2013" data-km="141000" data-precio="17756000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-expert-1-6-hdi-confort-2013-blanca-141000km/" target="_blank">EXPERT 1.6 HDI CONFORT</a></td>
+            <td>2013</td>
+            <td>141000</td>
+            <td>$17,756,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="PEUGEOT" data-modelo="PARTNER CONFORT 1.6 VTI" data-anio="2024" data-km="50000" data-precio="24808000">
+            <td>PEUGEOT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/peugeot-partner-confort-1-6-vti-2024-gris-50000km/" target="_blank">PARTNER CONFORT 1.6 VTI</a></td>
+            <td>2024</td>
+            <td>50000</td>
+            <td>$24,808,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="RENAULT" data-modelo="CLIO 1.2 5P CONFORT" data-anio="2016" data-km="92000" data-precio="12600000">
+            <td>RENAULT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/renault-clio-1-2-5p-confort-2016-gris-92000km/" target="_blank">CLIO 1.2 5P CONFORT</a></td>
+            <td>2016</td>
+            <td>92000</td>
+            <td>$12,600,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="RENAULT" data-modelo="DUSTER 1.6 DINAMIQUE" data-anio="2019" data-km="156000" data-precio="18715000">
+            <td>RENAULT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/renault-duster-1-6-dynamique-2019-blanco-156000km/" target="_blank">DUSTER 1.6 DINAMIQUE</a></td>
+            <td>2019</td>
+            <td>156000</td>
+            <td>$18,715,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="RENAULT" data-modelo="DUSTER 1.6 DINAMIQUE" data-anio="2018" data-km="126000" data-precio="16650000">
+            <td>RENAULT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/renault-duster-1-6-dynamique-2018-gris-126000km/" target="_blank">DUSTER 1.6 DINAMIQUE</a></td>
+            <td>2018</td>
+            <td>126000</td>
+            <td>$16,650,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="RENAULT" data-modelo="DUSTER 1.6 DINAMIQUE" data-anio="2016" data-km="115000" data-precio="15030000">
+            <td>RENAULT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/renault-duster-1-6-dynamique-2016-negro-115000km/" target="_blank">DUSTER 1.6 DINAMIQUE</a></td>
+            <td>2016</td>
+            <td>115000</td>
+            <td>$15,030,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="RENAULT" data-modelo="DUSTER 1.6 DINAMIQUE" data-anio="2018" data-km="133000" data-precio="17020000">
+            <td>RENAULT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/renault-duster-1-6-dinamique-2018-blanco-133000km/" target="_blank">DUSTER 1.6 DINAMIQUE</a></td>
+            <td>2018</td>
+            <td>133000</td>
+            <td>$17,020,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="RENAULT" data-modelo="DUSTER 1.6 EXPRESSION" data-anio="2017" data-km="80000" data-precio="18525000">
+            <td>RENAULT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/renault-duster-1-6-expression-2017-gris-80000km/" target="_blank">DUSTER 1.6 EXPRESSION</a></td>
+            <td>2017</td>
+            <td>80000</td>
+            <td>$18,525,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="RENAULT" data-modelo="SANDERO RS" data-anio="2018" data-km="62000" data-precio="19709500">
+            <td>RENAULT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/renault-sandero-rs-2018-gris-62000km/" target="_blank">SANDERO RS</a></td>
+            <td>2018</td>
+            <td>62000</td>
+            <td>$19,709,500</td>
+        </tr>
+        <tr class="auto-row" data-marca="RENAULT" data-modelo="SANDERO STEPWAY PRIVILEGE" data-anio="2017" data-km="146000" data-precio="13000000">
+            <td>RENAULT</td>
+            <td><a href="https://www.fortunatofortino.com/usado/renault-sandero-stepway-privilege-2017-blanco-146000km/" target="_blank">SANDERO STEPWAY PRIVILEGE</a></td>
+            <td>2017</td>
+            <td>146000</td>
+            <td>$13,000,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="TOYOTA" data-modelo="ETIOS X 1.5 6M/T" data-anio="2023" data-km="60000" data-precio="22350000">
+            <td>TOYOTA</td>
+            <td><a href="https://www.fortunatofortino.com/usado/toyota-etios-x-1-5-6m-t-2023-gris-60000km/" target="_blank">ETIOS X 1.5 6M/T</a></td>
+            <td>2023</td>
+            <td>60000</td>
+            <td>$22,350,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="TOYOTA" data-modelo="YARIS 1.5 5P S" data-anio="2025" data-km="9300" data-precio="36447000">
+            <td>TOYOTA</td>
+            <td><a href="https://www.fortunatofortino.com/usado/toyota-yaris-1-5-5p-s-2025-blanco-9300km/" target="_blank">YARIS 1.5 5P S</a></td>
+            <td>2025</td>
+            <td>9300</td>
+            <td>$36,447,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="TOYOTA" data-modelo="YARIS XS 1.5 6MT" data-anio="2019" data-km="123000" data-precio="21185000">
+            <td>TOYOTA</td>
+            <td><a href="https://www.fortunatofortino.com/usado/toyota-yaris-1-5-5pt-xs-2019-rojo-123000km/" target="_blank">YARIS XS 1.5 6MT</a></td>
+            <td>2019</td>
+            <td>123000</td>
+            <td>$21,185,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOGE" data-modelo="RALLY 300" data-anio="2024" data-km="7500" data-precio="6777300">
+            <td>VOGE</td>
+            <td><a href="https://www.fortunatofortino.com/usado/voge-rally-300-2024-blanco-7500km/" target="_blank">RALLY 300</a></td>
+            <td>2024</td>
+            <td>7500</td>
+            <td>$6,777,300</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOLKSWAGEN" data-modelo="SURAN COMFORTLINE" data-anio="2016" data-km="87000" data-precio="15641000">
+            <td>VOLKSWAGEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/volkswagen-suran-comfortline-2016-gris-87000km/" target="_blank">SURAN COMFORTLINE</a></td>
+            <td>2016</td>
+            <td>87000</td>
+            <td>$15,641,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOLKSWAGEN" data-modelo="SURAN COMFORTLINE" data-anio="2019" data-km="90000" data-precio="18937000">
+            <td>VOLKSWAGEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/vw-suran-comfortline-2019-blanco-90000km/" target="_blank">SURAN COMFORTLINE</a></td>
+            <td>2019</td>
+            <td>90000</td>
+            <td>$18,937,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOLKSWAGEN" data-modelo="SURAN TRENDLINE" data-anio="2016" data-km="72000" data-precio="15105000">
+            <td>VOLKSWAGEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/volkswagen-suran-trendline-2016-rojo-72000km/" target="_blank">SURAN TRENDLINE</a></td>
+            <td>2016</td>
+            <td>72000</td>
+            <td>$15,105,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOLKSWAGEN" data-modelo="T-CROSS TRENDLINE" data-anio="2020" data-km="107000" data-precio="23655000">
+            <td>VOLKSWAGEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/volkswagen-t-cross-trendline-2020-marron-107000km/" target="_blank">T-CROSS TRENDLINE</a></td>
+            <td>2020</td>
+            <td>107000</td>
+            <td>$23,655,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOLKSWAGEN" data-modelo="UP 1.0 MOVE 3PTS" data-anio="2014" data-km="90000" data-precio="11135000">
+            <td>VOLKSWAGEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/volkswagen-up-1-0-move-3pts-2014-gris-oscuro-90000km/" target="_blank">UP 1.0 MOVE 3PTS</a></td>
+            <td>2014</td>
+            <td>90000</td>
+            <td>$11,135,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOLKSWAGEN" data-modelo="UP 1.0 TAKE AA 5PTS" data-anio="2019" data-km="82000" data-precio="16156000">
+            <td>VOLKSWAGEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/volkswagen-up-1-0-take-aa-5pts-2019-blanco-82000km/" target="_blank">UP 1.0 TAKE AA 5PTS</a></td>
+            <td>2019</td>
+            <td>82000</td>
+            <td>$16,156,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOLKSWAGEN" data-modelo="UP 1.0 TAKE AA 5PTS" data-anio="2016" data-km="93000" data-precio="12825000">
+            <td>VOLKSWAGEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/volkswagen-up-1-0-take-aa-5pts-2016-blanco-93000km/" target="_blank">UP 1.0 TAKE AA 5PTS</a></td>
+            <td>2016</td>
+            <td>93000</td>
+            <td>$12,825,000</td>
+        </tr>
+        <tr class="auto-row" data-marca="VOLKSWAGEN" data-modelo="VIRTUS TRENDLINE" data-anio="2020" data-km="145000" data-precio="16560000">
+            <td>VOLKSWAGEN</td>
+            <td><a href="https://www.fortunatofortino.com/usado/vw-virtus-trendline2020-blanco-145000km/" target="_blank">VIRTUS TRENDLINE</a></td>
+            <td>2020</td>
+            <td>145000</td>
+            <td>$16,560,000</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="noResults" class="no-results">No se encontraron vehículos.</div>
+
+<script>
+function filtrarTabla() {
+    const buscar = document.getElementById('searchBox').value.toUpperCase();
+    const anioMin = parseInt(document.getElementById('anioMin').value) || 0;
+    const kmMax = parseInt(document.getElementById('kmMax').value) || Infinity;
+    const orden = document.getElementById('ordenPrecio').value;
+    
+    const tbody = document.getElementById('cuerpoTabla');
+    const filas = Array.from(document.getElementsByClassName('auto-row'));
+    let visibles = 0;
+
+    filas.forEach(fila => {
+        const marca = fila.getAttribute('data-marca').toUpperCase();
+        const modelo = fila.getAttribute('data-modelo').toUpperCase();
+        const anio = parseInt(fila.getAttribute('data-anio')) || 0;
+        const km = parseInt(fila.getAttribute('data-km')) || 0;
+        
+        const coincideTexto = marca.includes(buscar) || modelo.includes(buscar);
+        const coincideAnio = anio >= anioMin;
+        const coincideKm = km <= kmMax;
+
+        if (coincideTexto && coincideAnio && coincideKm) {
+            fila.style.display = "";
+            visibles++;
+        } else {
+            fila.style.display = "none";
+        }
+    });
+
+    if (orden === 'asc' || orden === 'desc') {
+        filas.sort((a, b) => {
+            const precioA = parseInt(a.getAttribute('data-precio')) || 0;
+            const precioB = parseInt(b.getAttribute('data-precio')) || 0;
+            return orden === 'asc' ? precioA - precioB : precioB - precioA;
+        });
+        filas.forEach(fila => tbody.appendChild(fila));
+    }
+
+    document.getElementById('total-filtrado').innerText = visibles;
+    document.getElementById('noResults').style.display = visibles === 0 ? "block" : "none";
+}
+</script>
+</body>
+</html>
